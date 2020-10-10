@@ -36,13 +36,19 @@ RUN apt-get update && apt-get install -y \
   python3-pip \
   libboost-all-dev \
   libboost-python-dev \
-  tmux
+  tmux \
+  wget
 
 WORKDIR /
-RUN pip3 install gfootball==2.0.4
 RUN pip3 install tensorflow_probability==0.9.0
 
+RUN git clone -b v2.6 https://github.com/google-research/football.git
+RUN mkdir -p football/third_party/gfootball_engine/lib
+RUN wget https://storage.googleapis.com/gfootball/prebuilt_gameplayfootball_v2.6.so -O football/third_party/gfootball_engine/lib/prebuilt_gameplayfootball.so
+RUN cd football && GFOOTBALL_USE_PREBUILT_SO=1 pip3 install .
+
 # Copy SEED codebase and SEED GRPC library.
+WORKDIR /
 ADD . /seed_rl/
 WORKDIR /seed_rl
 ENTRYPOINT ["python", "gcp/run.py"]

@@ -37,5 +37,7 @@ docker_version=$(docker version --format '{{.Server.Version}}')
 if [[ "19.03" > $docker_version ]]; then
   docker run --entrypoint ./docker/run.sh -ti -it --name seed --rm seed_rl:$ENVIRONMENT $ENVIRONMENT $AGENT $NUM_ACTORS
 else
-  docker run --gpus all --entrypoint ./docker/run.sh -ti -it -e HOST_PERMS="$(id -u):$(id -g)" --name seed --rm seed_rl:$ENVIRONMENT $ENVIRONMENT $AGENT $NUM_ACTORS
+  #docker run --gpus all --entrypoint ./docker/run.sh -ti -it -e HOST_PERMS="$(id -u):$(id -g)" --name seed --rm seed_rl:$ENVIRONMENT $ENVIRONMENT $AGENT $NUM_ACTORS
+  CONFIG="--total_environment_frames=10000 --game=11_vs_11_kaggle --reward_experiment=scoring,checkpoints --logdir=/kaggle_simulations/agent/"
+  docker run --entrypoint ./docker/run.sh -ti -it -e HOST_PERMS="$(id -u):$(id -g)" --name seed --rm seed_rl:$ENVIRONMENT $ENVIRONMENT $AGENT $NUM_ACTORS $CONFIG
 fi
